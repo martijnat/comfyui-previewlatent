@@ -8,4 +8,4 @@ Useful for showing intermediate results and can be used a faster "preview image"
 - Previews are full resolution (Ksampler previews are limited to 512x512)
 - Previews are temporary PNG files with full workflow metadata just like "Preview Image" (so right lick and using save image can save youre workflow)
 
-<img src="https://github.com/martijnat/comfyui-preview/blob/main/previewlatent.png" style="display: inline-block;">
+<img src="https://github.com/martijnat/comfyui-previewlatent/blob/main/previewlatent.png" style="display: inline-block;">
