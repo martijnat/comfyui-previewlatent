@@ -1,5 +1,5 @@
 # comfyui-previewlatent
-a <a href="https://github.com/comfyanonymous/ComfyUI">ComfyUI</a> plugin for previewing latents without decoding.
+a <a href="https://github.com/comfyanonymous/ComfyUI">ComfyUI</a> plugin for previewing latents without vae decoding.
 Useful for showing intermediate results and can be used a faster "preview image" if you don't wan't to use vae decode.
 
 - Forwards input latent to output, so can be used as a fancy reroute node.
