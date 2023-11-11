@@ -17,7 +17,7 @@ class PreviewLatentAdvanced:
         return {"required":
                     {"latent": ("LATENT",),
                      "base_model": (["SD15","SDXL"],),
-                     "preview_method": (["auto","taesd","latent2rgb","none"],),
+                     "preview_method": (["auto","taesd","latent2rgb"],),
                      },
                 "hidden": {"prompt": "PROMPT",
                            "extra_pnginfo": "EXTRA_PNGINFO",
@@ -36,8 +36,6 @@ class PreviewLatentAdvanced:
             temp_previewer = latent_preview.LatentPreviewMethod.TAESD
         elif preview_method == "latent2rgb":
             temp_previewer = latent_preview.LatentPreviewMethod.Latent2RGB
-        elif preview_method == "none":
-            temp_previewer = latent_preview.LatentPreviewMethod.NoPreviews
         else:
             temp_previewer = latent_preview.LatentPreviewMethod.Auto
 
