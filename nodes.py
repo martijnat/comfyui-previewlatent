@@ -10,7 +10,7 @@ import comfy.utils
 from comfy.cli_args import args
 import random
 import torch
-import numpy as np
+import torchvision.transforms as TT
 
 class PreviewLatentAdvanced:
     @classmethod
@@ -60,9 +60,7 @@ class PreviewLatentAdvanced:
 
                 img = latent_preview.get_previewer(load_device, latent_format).decode_latent_to_preview(x_sample)
                 
-                image = np.array(img).astype(np.float32) / 255.0
-                image = torch.from_numpy(image)[None,]
-                output_images.append(image)
+                output_images.append(TT.ToTensor()(img))
                 
                 full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path("",folder_paths.get_temp_directory(), img.height, img.width)
                 metadata = None
@@ -82,13 +80,11 @@ class PreviewLatentAdvanced:
             # Restore global changes
             args.preview_method=previous_preview_method
 
-        if len(output_images) > 1:
-            output_image = torch.cat(output_images, dim=0)
-        else:
-            output_image = output_images[0]
+        output_images = torch.stack(output_images, dim=0)
+        output_images = output_images.permute([0,2,3,1])
         
         if img_output:
-            return (output_image, )
+            return (output_images, )
         else:
             return {"result": (latent,), "ui": { "images": results } }
 
