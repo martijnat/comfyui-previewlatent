@@ -10,6 +10,7 @@ import comfy.utils
 from comfy.cli_args import args
 import random
 import torch
+import numpy as np
 
 class PreviewLatentAdvanced:
     @classmethod
@@ -21,7 +22,8 @@ class PreviewLatentAdvanced:
                      },
                 "hidden": {"prompt": "PROMPT",
                            "extra_pnginfo": "EXTRA_PNGINFO",
-                           "my_unique_id": "UNIQUE_ID",},
+                           "my_unique_id": "UNIQUE_ID",
+                           "img_output": "IMG_OUTPUT",},
                 }
 
     RETURN_TYPES = ("LATENT",)
@@ -30,7 +32,7 @@ class PreviewLatentAdvanced:
     FUNCTION = "lpreview"
     CATEGORY = "latent"
 
-    def lpreview(self, latent, base_model, preview_method, prompt=None, extra_pnginfo=None, my_unique_id=None):
+    def lpreview(self, latent, base_model, preview_method, prompt=None, extra_pnginfo=None, my_unique_id=None, img_output=False):
         previous_preview_method = args.preview_method
         if preview_method == "taesd":
             temp_previewer = latent_preview.LatentPreviewMethod.TAESD
@@ -40,6 +42,7 @@ class PreviewLatentAdvanced:
             temp_previewer = latent_preview.LatentPreviewMethod.Auto
 
         results = list()
+        output_images=[]
 
         try:
             args.preview_method=temp_previewer
@@ -56,6 +59,11 @@ class PreviewLatentAdvanced:
                 x_sample = x_sample / 6;
 
                 img = latent_preview.get_previewer(load_device, latent_format).decode_latent_to_preview(x_sample)
+                
+                image = np.array(img).astype(np.float32) / 255.0
+                image = torch.from_numpy(image)[None,]
+                output_images.append(image)
+                
                 full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path("",folder_paths.get_temp_directory(), img.height, img.width)
                 metadata = None
                 if not args.disable_metadata:
@@ -74,7 +82,15 @@ class PreviewLatentAdvanced:
             # Restore global changes
             args.preview_method=previous_preview_method
 
-        return {"result": (latent,), "ui": { "images": results } }
+        if len(output_images) > 1:
+            output_image = torch.cat(output_images, dim=0)
+        else:
+            output_image = output_images[0]
+        
+        if img_output:
+            return (output_image, )
+        else:
+            return {"result": (latent,), "ui": { "images": results } }
 
 class PreviewLatent(PreviewLatentAdvanced):
     @classmethod
@@ -95,3 +111,25 @@ class PreviewLatent(PreviewLatentAdvanced):
 
     def lpreview_basic(self, latent, prompt=None, extra_pnginfo=None, my_unique_id=None):
         return PreviewLatentAdvanced().lpreview(latent=latent, base_model="SD15", preview_method="auto", prompt=prompt, extra_pnginfo=extra_pnginfo, my_unique_id=my_unique_id)
+
+class TAESDDecodeLatent(PreviewLatentAdvanced):
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {"required":
+                    {"latent": ("LATENT",),
+                     "base_model": (["SD15","SDXL"],),
+                     },
+                "hidden": {"prompt": "PROMPT",
+                           "extra_pnginfo": "EXTRA_PNGINFO",
+                           "my_unique_id": "UNIQUE_ID",
+                           "img_output": "IMG_OUTPUT",},
+                }
+
+    RETURN_TYPES = ("IMAGE", )
+    RETURN_NAMES = ("image", )
+    OUTPUT_NODE = True
+    FUNCTION = "lpreview_output"
+    CATEGORY = "latent"
+
+    def lpreview_output(self, latent, base_model, preview_method="taesd", prompt=None, extra_pnginfo=None, my_unique_id=None, img_output=True):
+        return PreviewLatentAdvanced().lpreview(latent=latent, base_model=base_model, preview_method=preview_method, prompt=prompt, extra_pnginfo=extra_pnginfo, my_unique_id=my_unique_id,  img_output=img_output)
