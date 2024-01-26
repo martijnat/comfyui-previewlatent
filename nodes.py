@@ -62,19 +62,20 @@ class PreviewLatentAdvanced:
                 
                 output_images.append(TT.ToTensor()(img))
                 
-                full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path("",folder_paths.get_temp_directory(), img.height, img.width)
-                metadata = None
-                if not args.disable_metadata:
-                    metadata = PngInfo()
-                    if prompt is not None:
-                        metadata.add_text("prompt", json.dumps(prompt))
-                    if extra_pnginfo is not None:
-                        for x in extra_pnginfo:
-                            metadata.add_text(x, json.dumps(extra_pnginfo[x]))
+                if not img_output:
+                    full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path("",folder_paths.get_temp_directory(), img.height, img.width)
+                    metadata = None
+                    if not args.disable_metadata:
+                        metadata = PngInfo()
+                        if prompt is not None:
+                            metadata.add_text("prompt", json.dumps(prompt))
+                        if extra_pnginfo is not None:
+                            for x in extra_pnginfo:
+                                metadata.add_text(x, json.dumps(extra_pnginfo[x]))
 
-                file = "latent_"+"".join(random.choice("0123456789") for x in range(8))+".png"
-                img.save(os.path.join(full_output_folder, file), pnginfo=metadata, compress_level=4)
-                results.append({"filename": file, "subfolder": subfolder, "type": "temp"})
+                    file = "latent_"+"".join(random.choice("0123456789") for x in range(8))+".png"
+                    img.save(os.path.join(full_output_folder, file), pnginfo=metadata, compress_level=4)
+                    results.append({"filename": file, "subfolder": subfolder, "type": "temp"})
 
         finally:
             # Restore global changes
