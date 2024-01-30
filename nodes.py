@@ -53,7 +53,7 @@ class PreviewLatentAdvanced:
                 x=latent.copy()
                 x["samples"] = latent["samples"][i:i+1].clone()
                 x_sample = x["samples"]
-                x_sample = x_sample / 6;
+                x_sample = x_sample /  {"SD15":6,"SDXL":7.5}[base_model]
 
                 img = latent_preview.get_previewer(load_device, latent_format).decode_latent_to_preview(x_sample)
                 full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path("",folder_paths.get_temp_directory(), img.height, img.width)
