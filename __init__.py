@@ -3,6 +3,7 @@ from .nodes import PreviewLatent,PreviewLatentAdvanced
 NODE_CLASS_MAPPINGS = {
     "PreviewLatent": PreviewLatent,
     "PreviewLatentAdvanced": PreviewLatentAdvanced,
+    "PreviewLatentXL": PreviewLatentXL,
 
 }
 
