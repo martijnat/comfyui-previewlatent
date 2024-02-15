@@ -9,5 +9,5 @@ NODE_CLASS_MAPPINGS = {
 NODE_DISPLAY_NAME_MAPPINGS = {
     "PreviewLatent": "Preview Latent",
     "PreviewLatentAdvanced": "Preview Latent (Advanced)",
-    "PreviewLatentXL", "Preview Latent XL",
+    "PreviewLatentXL": "Preview Latent XL",
 }
