@@ -1,4 +1,4 @@
-from .nodes import PreviewLatent,PreviewLatentAdvanced
+from .nodes import PreviewLatent,PreviewLatentAdvanced,PreviewLatentXL
 
 NODE_CLASS_MAPPINGS = {
     "PreviewLatent": PreviewLatent,
