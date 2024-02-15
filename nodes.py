@@ -95,3 +95,23 @@ class PreviewLatent(PreviewLatentAdvanced):
 
     def lpreview_basic(self, latent, prompt=None, extra_pnginfo=None, my_unique_id=None):
         return PreviewLatentAdvanced().lpreview(latent=latent, base_model="SD15", preview_method="auto", prompt=prompt, extra_pnginfo=extra_pnginfo, my_unique_id=my_unique_id)
+
+class PreviewLatentXL(PreviewLatentAdvanced):
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {"required":
+                    {"latent": ("LATENT",),
+                     },
+                "hidden": {"prompt": "PROMPT",
+                           "extra_pnginfo": "EXTRA_PNGINFO",
+                           "my_unique_id": "UNIQUE_ID",},
+                }
+
+    RETURN_TYPES = ("LATENT",)
+    RETURN_NAMES = ("latent",)
+    OUTPUT_NODE = True
+    FUNCTION = "lpreview_xl"
+    CATEGORY = "latent"
+
+    def lpreview_xl(self, latent, prompt=None, extra_pnginfo=None, my_unique_id=None):
+        return PreviewLatentAdvanced().lpreview(latent=latent, base_model="SDXL", preview_method="auto", prompt=prompt, extra_pnginfo=extra_pnginfo, my_unique_id=my_unique_id)
