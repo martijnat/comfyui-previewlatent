@@ -16,7 +16,13 @@ class PreviewLatentAdvanced:
     def INPUT_TYPES(cls):
         return {"required":
                     {"latent": ("LATENT",),
-                     "base_model": (["SD15","SDXL"],),
+                     "base_model": (["SD15",
+                                     "SDXL",
+                                     "SD3",
+                                     "Flux",
+                                     "Wan21",
+                                     "Wan22",
+                                     "LTXV"],),
                      "preview_method": (["auto","taesd","latent2rgb"],),
                      },
                 "hidden": {"prompt": "PROMPT",
@@ -46,15 +52,21 @@ class PreviewLatentAdvanced:
             preview_format = "PNG"
             load_device=comfy.model_management.vae_offload_device()
             latent_format = {"SD15":latent_formats.SD15,
-                             "SDXL":latent_formats.SDXL}[base_model]()
+                             "SDXL":latent_formats.SDXL,
+                             "SD15":latent_formats.SD15,
+                             "SDXL":latent_formats.SDXL,
+                             "SD3":latent_formats.SD3,
+                             "Flux":latent_formats.Flux,
+                             "Wan21":latent_formats.Wan21,
+                             "Wan22":latent_formats.Wan22,
+                             "LTXV":latent_formats.LTXV,
+                             }[base_model]()
 
             result=[]
             for i in range(len(latent["samples"])):
                 x=latent.copy()
                 x["samples"] = latent["samples"][i:i+1].clone()
-                x_sample = x["samples"]
-                x_sample = x_sample /  {"SD15":6,"SDXL":7.5}[base_model]
-
+                x_sample = x["samples"] * latent_format.scale_factor
                 img = latent_preview.get_previewer(load_device, latent_format).decode_latent_to_preview(x_sample)
                 full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path("",folder_paths.get_temp_directory(), img.height, img.width)
                 metadata = None
@@ -100,8 +112,8 @@ class PreviewLatentXL(PreviewLatentAdvanced):
     @classmethod
     def INPUT_TYPES(cls):
         return {"required":
-                    {"latent": ("LATENT",),
-                     },
+                {"latent": ("LATENT",),
+                 },
                 "hidden": {"prompt": "PROMPT",
                            "extra_pnginfo": "EXTRA_PNGINFO",
                            "my_unique_id": "UNIQUE_ID",},
@@ -115,3 +127,24 @@ class PreviewLatentXL(PreviewLatentAdvanced):
 
     def lpreview_xl(self, latent, prompt=None, extra_pnginfo=None, my_unique_id=None):
         return PreviewLatentAdvanced().lpreview(latent=latent, base_model="SDXL", preview_method="auto", prompt=prompt, extra_pnginfo=extra_pnginfo, my_unique_id=my_unique_id)
+
+
+class PreviewLatentFlux(PreviewLatentAdvanced):
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {"required":
+                {"latent": ("LATENT",),
+                 },
+                "hidden": {"prompt": "PROMPT",
+                           "extra_pnginfo": "EXTRA_PNGINFO",
+                           "my_unique_id": "UNIQUE_ID",},
+                }
+
+    RETURN_TYPES = ("LATENT",)
+    RETURN_NAMES = ("latent",)
+    OUTPUT_NODE = True
+    FUNCTION = "lpreview_flux"
+    CATEGORY = "latent"
+
+    def lpreview_flux(self, latent, prompt=None, extra_pnginfo=None, my_unique_id=None):
+        return PreviewLatentAdvanced().lpreview(latent=latent, base_model="Flux", preview_method="auto", prompt=prompt, extra_pnginfo=extra_pnginfo, my_unique_id=my_unique_id)
